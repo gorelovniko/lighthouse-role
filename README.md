@@ -1,64 +1,55 @@
-Role Name
+Lighthouse-role
 =========
 
-Роль для установки lighthouse.
-- Устновка Git
-- Скачивание lighthouse из репозитория
-- Конфигурирование lighthouse
+Роль устанавливает ПО Nginx и Lighthouse.
 
-Requirements
+Предварительные требования
 ------------
 
-- Должен быть установлен git. Если его нет, роль произведёт его установку
-- Требуется отдельная установка и настройка Nginx
+Предполагается что роль будет выполняться на deb-based дистрибутивах Linux (Debian, Ubuntu).  
+Предполагается что на машине уже будет установлена утилита unzip.
 
-Role Variables
+Переменные роли
 --------------
 
-Переменные для установки кредов
-default/main.yml:
-```yaml
-clickhouse_user: netology
-clickhouse_password: netology
-```
+В [переменных по умолчанию](./defaults/main.yml) указана версия ПО Nginx 1.18.0, в случае необходимости её нужно изменить.  
+В [изменяемых переменных](./defaults/main.yml) указан порт по которому будет слушать ПО Lighthouse. По умолчанию это порт 80, в случае необходимости его можно изменить.
 
-Переменные для скачивания lighthouse из git и конфигурационных файлов lighthouse/nginx
-vars/main.yml
-```yaml
-lighthouse_vcs: https://github.com/VKCOM/lighthouse.git
-lighthouse_dir: /var/lib/lighthouse
-lighthouse_access_log_name: lighthouse_access
-```
-
-Dependencies
+Зависимости
 ------------
 
-Требуется роль [clickhouse-role](../clickhouse)
+Нет зависимостей
 
-Example Playbook
+Пример плейбука с использованием роли
 ----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-```yaml
-hosts: lighthouse
-roles:
-  - role: lighthouse-role
+Пример для использования на машинах на которых уже установлена утилита Unzip:
+```
+- name: Install Lighthouse
+  hosts: lighthouse
+  roles:
+    - lighthouse-role
 ```
 
-Для вывода строки подключения можно использовать post_tasks
-
-```yaml
-post_tasks:
-  - name: Show connect URL lighthouse
-    debug:
-      msg: "http://{{ ansible_host }}/#http://{{ hostvars['clickhouse-01'].ansible_host }}:8123/?user={{ clickhouse_user }}"
+Пример с установкой утилиты Unzip в рамках pre_tasks в плее использующем данную роль:
+```
+- name: Install Lighthouse
+  hosts: lighthouse
+  pre_tasks:
+    - name: install unzip
+      become: true
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+        update_cache: yes
+  roles:
+    - lighthouse-role
 ```
 
 License
 -------
 
-MIT
+Free
 
 Author Information
 ------------------
+GorelovNN

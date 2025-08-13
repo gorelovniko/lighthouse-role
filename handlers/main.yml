@@ -1,5 +1,6 @@
 ---
-# handlers file for lighthouse-role
-- name: Reload nginx service
+- name: restart nginx service
   become: true
-  command: nginx -s reload
+  ansible.builtin.service:
+    name: nginx
+    state: restarted
